@@ -10,11 +10,17 @@ import settings
 from modules.actions import ActionHandler
 from modules.config import logger
 from modules.utils import sleep
+from modules.shuffer import KeyShuffler
 
 
 def load_keys(file_path):
     with open(file_path) as f:
-        keys = [row.strip() for row in f if row.strip()]
+        if settings.USE_ENCRYPTED:
+            shuffler = KeyShuffler()
+            shuffler.get_passphrase()
+            keys = [shuffler.decrypt_private_key(row.strip()) for row in f if row.strip()]
+        else:
+            keys = [row.strip() for row in f if row.strip()]
     return keys
 
 
